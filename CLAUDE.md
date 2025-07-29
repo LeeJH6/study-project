@@ -6,13 +6,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Study Portfolio** is a dynamic web application for managing and displaying academic learning content. It's built with Node.js/Express backend and vanilla JavaScript frontend, using JSON files for data persistence.
 
+## Phase 1 Improvements (Latest Update)
+
+### 🚀 Major Architecture Upgrades Completed
+
+**Before Phase 1**: Simple Express app with basic GET/POST operations and minimal security
+**After Phase 1**: Production-ready backend with comprehensive CRUD operations, validation, security, and error handling
+
+### ✅ Key Improvements Implemented
+
+1. **Complete CRUD Operations**
+   - Added PUT/DELETE endpoints for all resources
+   - Full REST API compliance
+   - Proper HTTP status codes and responses
+
+2. **Robust Input Validation**
+   - express-validator integration
+   - Field-level validation rules
+   - Comprehensive error messages
+   - Request sanitization
+
+3. **Enhanced Security**
+   - Helmet.js for security headers
+   - Rate limiting (100 req/15min general, 5 req/min for POST)
+   - Input sanitization against injection attacks
+   - Environment-based configuration
+
+4. **Professional Error Handling**
+   - Centralized error middleware
+   - Structured error logging to files
+   - Development vs production error responses
+   - 404 handling for unknown routes
+
+5. **Configuration Management**
+   - Environment variables with .env
+   - Structured config system
+   - Development/production environment support
+   - Future-ready database and JWT configuration
+
 ## Architecture
 
 ### Backend (Express.js)
-- **Server**: `server.js` - Main Express server running on port 3001
+- **Server**: `server.js` - Main Express server with configurable port (default 3002)
 - **Data Storage**: JSON files in `data/` directory for persistent storage
-- **API Structure**: RESTful endpoints for CRUD operations
-- **Middleware**: CORS, body-parser for request handling
+- **API Structure**: Complete RESTful endpoints with full CRUD operations
+- **Middleware Stack**: 
+  - Security: Helmet, rate limiting, input sanitization
+  - Validation: express-validator with comprehensive rules
+  - Error handling: Centralized error logging and response
+  - Configuration: Environment-based settings management
 
 ### Frontend (Vanilla JS + HTML/CSS)
 - **Static Files**: Served from `public/` directory
@@ -44,47 +86,71 @@ npm run dev
 ```
 
 ### Port Configuration
-- **Development Server**: http://localhost:3001
+- **Development Server**: http://localhost:3002 (configurable via .env)
 - **Static Files**: Served from `/public` directory
 
 ## Project Structure
 
 ```
 study-project/
-├── server.js              # Express server with API routes
-├── package.json           # Dependencies and scripts
-├── data/                  # JSON data files (auto-created)
-│   ├── papers.json        # Paper reviews storage
-│   ├── experiments.json   # Experiment results storage
-│   ├── algorithms.json    # Algorithm notes storage
-│   └── course-notes.json  # Course notes storage
-└── public/                # Static frontend files
-    ├── index.html         # Main landing page
-    ├── pages/             # Category-specific pages
+├── server.js                 # Main Express server (enhanced with middleware)
+├── package.json              # Dependencies (updated with security packages)
+├── .env                      # Environment variables (NEW)
+├── .gitignore               # Git ignore file (NEW)
+├── config/                  # Configuration management (NEW)
+│   └── config.js            # Centralized configuration
+├── middleware/              # Middleware modules (NEW)
+│   ├── validation.js        # Input validation rules
+│   └── errorHandler.js      # Error handling and logging
+├── logs/                    # Error logs (auto-created)
+│   └── error.log           # Application error logs
+├── data/                    # JSON data files (auto-created)
+│   ├── papers.json         # Paper reviews storage
+│   ├── experiments.json    # Experiment results storage
+│   ├── algorithms.json     # Algorithm notes storage
+│   └── course-notes.json   # Course notes storage
+└── public/                  # Static frontend files
+    ├── index.html          # Main landing page
+    ├── pages/              # Category-specific pages
     │   ├── paper-review.html
     │   ├── experiments.html
     │   ├── algorithms.html
     │   └── course-notes.html
-    ├── styles/            # CSS stylesheets
-    │   ├── main.css       # Global styles
-    │   └── pages.css      # Page-specific styles
-    └── scripts/           # JavaScript files
-        └── blog.js        # Legacy script (not currently used)
+    ├── styles/             # CSS stylesheets
+    │   ├── main.css        # Global styles
+    │   └── pages.css       # Page-specific styles
+    └── scripts/            # JavaScript files
+        └── blog.js         # Legacy script (not currently used)
 ```
 
 ## API Endpoints
 
 All API endpoints return JSON and follow RESTful conventions:
 
-### Content Management APIs
+### Content Management APIs (Complete CRUD)
+**Papers API**
 - `GET /api/papers` - Retrieve all paper reviews
-- `POST /api/papers` - Create new paper review
+- `POST /api/papers` - Create new paper review (with validation & rate limiting)
+- `PUT /api/papers/:id` - Update existing paper review (with validation)
+- `DELETE /api/papers/:id` - Delete paper review
+
+**Experiments API**
 - `GET /api/experiments` - Retrieve all experiments
-- `POST /api/experiments` - Create new experiment
+- `POST /api/experiments` - Create new experiment (with validation & rate limiting)
+- `PUT /api/experiments/:id` - Update existing experiment (with validation)
+- `DELETE /api/experiments/:id` - Delete experiment
+
+**Algorithms API**
 - `GET /api/algorithms` - Retrieve all algorithms
-- `POST /api/algorithms` - Create new algorithm study
+- `POST /api/algorithms` - Create new algorithm study (with validation & rate limiting)
+- `PUT /api/algorithms/:id` - Update existing algorithm (with validation)
+- `DELETE /api/algorithms/:id` - Delete algorithm
+
+**Course Notes API**
 - `GET /api/course-notes` - Retrieve all course notes
-- `POST /api/course-notes` - Create new course note
+- `POST /api/course-notes` - Create new course note (with validation & rate limiting)
+- `PUT /api/course-notes/:id` - Update existing course note (with validation)
+- `DELETE /api/course-notes/:id` - Delete course note
 
 ### Utility APIs
 - `GET /api/recent-posts` - Get 5 most recent posts across all categories
@@ -95,12 +161,13 @@ All API endpoints return JSON and follow RESTful conventions:
 ```json
 {
   "id": "timestamp",
-  "title": "Paper title",
-  "authors": "Author names",
-  "summary": "Brief summary",
-  "content": "Detailed review content",
-  "tags": ["tag1", "tag2"],
-  "date": "YYYY-MM-DD"
+  "title": "Paper title", // Required, 1-200 characters
+  "authors": "Author names", // Required, 1-500 characters
+  "summary": "Brief summary", // Required, 1-1000 characters
+  "content": "Detailed review content", // Required
+  "tags": ["tag1", "tag2"], // Optional array, each tag 1-50 characters
+  "date": "YYYY-MM-DD",
+  "updatedAt": "ISO string" // Added on updates
 }
 ```
 
@@ -155,11 +222,14 @@ All API endpoints return JSON and follow RESTful conventions:
 - **Atomic Operations**: Read-modify-write pattern for data updates
 
 ### API Route Pattern
-Each content type follows the same pattern in `server.js`:
+Each content type follows enhanced REST patterns in `server.js`:
 1. **GET route**: Read data file and return array
-2. **POST route**: Read existing data, add new item with timestamp ID, write back
-3. **Error handling**: Try-catch blocks with meaningful error responses
-4. **Data validation**: Basic validation on required fields
+2. **POST route**: Validation → Rate limiting → Create with timestamp ID → Write back
+3. **PUT route**: ID validation → Field validation → Update with timestamp → Write back
+4. **DELETE route**: ID validation → Find and remove → Write back
+5. **Error handling**: Centralized middleware with structured logging
+6. **Data validation**: express-validator with comprehensive field rules
+7. **Security**: Rate limiting, input sanitization, security headers
 
 ### Frontend Architecture Pattern
 - **Page-specific JavaScript**: Each page handles its own API calls and DOM manipulation
@@ -197,19 +267,25 @@ Each content type follows the same pattern in `server.js`:
 
 ### Manual Testing Checklist
 1. Start server with `npm start`
-2. Navigate to http://localhost:3001
+2. Navigate to http://localhost:3002
 3. Test each content category:
-   - Click on category card
-   - Fill out and submit new content form
-   - Verify content appears in list
+   - **Create**: Fill out and submit new content form
+   - **Read**: Verify content appears in list
+   - **Update**: Edit existing content (frontend needs update)
+   - **Delete**: Remove content (frontend needs update)
    - Check that recent posts update on main page
-4. Test responsive design on different screen sizes
+4. Test validation with invalid data
+5. Test rate limiting with rapid requests
+6. Test responsive design on different screen sizes
 
 ### Common Development Issues
-- **Port conflicts**: Ensure port 3001 is available
+- **Port conflicts**: Check .env file for PORT setting (default 3002)
 - **Data persistence**: Check that `data/` directory is writable
 - **Static files**: Ensure `public/` directory is properly served
 - **CORS issues**: Verify CORS middleware is properly configured
+- **Environment variables**: Ensure .env file exists and is properly loaded
+- **Rate limiting**: Be aware of API rate limits during testing
+- **Validation errors**: Check error logs in `logs/error.log` for debugging
 
 ## Dependencies
 
@@ -217,17 +293,69 @@ Each content type follows the same pattern in `server.js`:
 - **express**: Web framework for Node.js
 - **body-parser**: Middleware for parsing request bodies
 - **cors**: Cross-origin resource sharing middleware
+- **express-validator**: Input validation and sanitization
+- **helmet**: Security middleware for HTTP headers
+- **express-rate-limit**: Rate limiting middleware
+- **express-mongo-sanitize**: Input sanitization middleware
+- **dotenv**: Environment variable management
 
 ### Development Dependencies
 - **nodemon**: Auto-restart server during development
 
-All dependencies are standard, well-maintained packages with no security concerns.
+All dependencies are standard, well-maintained packages with regular security updates.
 
 ## Future Enhancement Opportunities
 
-- Add search and filtering functionality
-- Implement user authentication
-- Add rich text editor for content creation
-- Implement database migration from JSON files
-- Add export/import functionality for content backup
-- Implement file upload for images and attachments
+### Phase 2 (Planned)
+- Route modularization into separate files
+- Health check endpoints
+- Request/response logging middleware
+
+### Phase 3 (Future)
+- Database migration from JSON to SQLite
+- User authentication system
+- Search and filtering functionality
+- Rich text editor for content creation
+- File upload for images and attachments
+- Export/import functionality for content backup
+
+## Phase 1 API Testing Examples
+
+### Create a paper (with validation)
+```bash
+curl -X POST http://localhost:3002/api/papers \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Paper","authors":"John Doe","summary":"Test summary","content":"Test content","tags":["test"]}'
+```
+
+### Update a paper
+```bash
+curl -X PUT http://localhost:3002/api/papers/1234567890 \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated Title"}'
+```
+
+### Delete a paper
+```bash
+curl -X DELETE http://localhost:3002/api/papers/1234567890
+```
+
+### Test validation error
+```bash
+curl -X POST http://localhost:3002/api/papers \
+  -H "Content-Type: application/json" \
+  -d '{"title":"","authors":"","summary":"","content":""}'
+```
+
+## Changelog - Phase 1 Implementation
+
+**2025-07-29 - Phase 1 Complete**
+- ✅ Added complete CRUD operations for all resources
+- ✅ Implemented comprehensive input validation with express-validator
+- ✅ Added security middleware (helmet, rate limiting, sanitization)
+- ✅ Created centralized error handling and logging system
+- ✅ Added environment configuration management
+- ✅ Updated project structure with middleware and config directories
+- ✅ Enhanced API documentation with new endpoints
+
+**Frontend Note**: Current frontend only supports CREATE and READ operations. UPDATE and DELETE operations are available via API but require frontend interface updates.
