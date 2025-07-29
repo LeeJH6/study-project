@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알고리즘 스터딩 - 나의 학습 포트폴리오</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/pages.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">홈</a> > <span>알고리즘 스터딩</span>
+            </nav>
+            <h1>⚡ 알고리즘 스터딩</h1>
+            <p>자료구조 및 알고리즘 학습</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="page-content">
+                <div class="content-header">
+                    <h2>알고리즘 학습 목록</h2>
+                    <button class="add-post-btn" onclick="showAddForm()">+ 새 알고리즘 추가</button>
+                </div>
+
+                <div id="add-form" class="add-form" style="display: none;">
+                    <h3>새 알고리즘 학습 추가</h3>
+                    <form onsubmit="addPost(event, 'algorithms')">
+                        <input type="text" name="title" placeholder="알고리즘/자료구조 이름" required>
+                        <input type="text" name="category" placeholder="카테고리 (예: 정렬, 그래프, DP)">
+                        <input type="text" name="difficulty" placeholder="난이도 (쉬움/보통/어려움)">
+                        <input type="date" name="date" required>
+                        <textarea name="content" placeholder="알고리즘 설명, 구현 코드, 시간복잡도 등을 입력하세요..." rows="10" required></textarea>
+                        <div class="form-buttons">
+                            <button type="submit">추가</button>
+                            <button type="button" onclick="hideAddForm()">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="posts-list" id="posts-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">⚡</div>
+                        <h3>아직 알고리즘 학습 기록이 없습니다</h3>
+                        <p>첫 번째 알고리즘 학습을 추가해보세요!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 나의 학습 포트폴리오. 모든 권리 보유.</p>
+        </div>
+    </footer>
+
+    <script src="../scripts/blog.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>논문 리뷰 - 나의 학습 포트폴리오</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/pages.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">홈</a> > <span>논문 리뷰</span>
+            </nav>
+            <h1>📄 논문 리뷰</h1>
+            <p>최신 연구 논문 분석 및 정리</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-actions">
+                <button class="btn-primary" onclick="showAddForm()">새 논문 리뷰 작성</button>
+            </div>
+
+            <!-- 새 논문 리뷰 추가 폼 -->
+            <div id="add-form" class="add-form" style="display: none;">
+                <h3>새 논문 리뷰 작성</h3>
+                <form id="paper-form">
+                    <div class="form-group">
+                        <label for="title">논문 제목</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="authors">저자들</label>
+                        <input type="text" id="authors" name="authors" placeholder="예: John Doe, Jane Smith" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="summary">요약</label>
+                        <textarea id="summary" name="summary" rows="3" placeholder="논문의 핵심 내용을 간단히 요약해주세요" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">상세 리뷰</label>
+                        <textarea id="content" name="content" rows="10" placeholder="논문에 대한 상세한 분석과 리뷰를 작성해주세요" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tags">태그</label>
+                        <input type="text" id="tags" name="tags" placeholder="쉼표로 구분하여 입력 (예: AI, 머신러닝, 딥러닝)">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">저장</button>
+                        <button type="button" class="btn-secondary" onclick="hideAddForm()">취소</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 논문 리뷰 목록 -->
+            <div class="content-list" id="papers-container">
+                <!-- 동적으로 로드됩니다 -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 나의 학습 포트폴리오. 모든 권리 보유.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 폼 표시/숨기기
+        function showAddForm() {
+            document.getElementById('add-form').style.display = 'block';
+            document.getElementById('title').focus();
+        }
+        
+        function hideAddForm() {
+            document.getElementById('add-form').style.display = 'none';
+            document.getElementById('paper-form').reset();
+        }
+
+        // 논문 리뷰 목록 로드
+        async function loadPapers() {
+            try {
+                const response = await fetch('/api/papers');
+                const papers = await response.json();
+                
+                const container = document.getElementById('papers-container');
+                
+                if (papers.length === 0) {
+                    container.innerHTML = '<p class="no-content">아직 작성된 논문 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>';
+                    return;
+                }
+                
+                container.innerHTML = papers.map(paper => `
+                    <article class="content-item">
+                        <div class="content-header">
+                            <h3>${paper.title}</h3>
+                            <span class="content-date">${paper.date}</span>
+                        </div>
+                        <p class="content-meta">저자: ${paper.authors}</p>
+                        <div class="content-summary">
+                            <p>${paper.summary}</p>
+                        </div>
+                        <div class="content-body">
+                            <p>${paper.content.substring(0, 200)}${paper.content.length > 200 ? '...' : ''}</p>
+                        </div>
+                        ${paper.tags && paper.tags.length > 0 ? `
+                            <div class="content-tags">
+                                ${paper.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </article>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading papers:', error);
+                document.getElementById('papers-container').innerHTML = 
+                    '<p class="error">논문 리뷰를 불러오는데 실패했습니다.</p>';
+            }
+        }
+
+        // 새 논문 리뷰 저장
+        document.getElementById('paper-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                title: formData.get('title'),
+                authors: formData.get('authors'),
+                summary: formData.get('summary'),
+                content: formData.get('content'),
+                tags: formData.get('tags') ? formData.get('tags').split(',').map(tag => tag.trim()) : []
+            };
+            
+            try {
+                const response = await fetch('/api/papers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    hideAddForm();
+                    loadPapers(); // 목록 새로고침
+                    alert('논문 리뷰가 성공적으로 저장되었습니다!');
+                } else {
+                    alert('저장에 실패했습니다: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error saving paper:', error);
+                alert('저장 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 페이지 로드 시 논문 목록 로드
+        document.addEventListener('DOMContentLoaded', loadPapers);
+    </script>
+</body>
+</html>

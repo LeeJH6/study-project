@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실험 결과 - 나의 학습 포트폴리오</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/pages.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">홈</a> > <span>실험 결과</span>
+            </nav>
+            <h1>🧪 실험 결과</h1>
+            <p>프로젝트 실험 및 결과 분석</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="page-content">
+                <div class="content-header">
+                    <h2>실험 결과 목록</h2>
+                    <button class="add-post-btn" onclick="showAddForm()">+ 새 실험 추가</button>
+                </div>
+
+                <div id="add-form" class="add-form" style="display: none;">
+                    <h3>새 실험 결과 추가</h3>
+                    <form onsubmit="addPost(event, 'experiments')">
+                        <input type="text" name="title" placeholder="실험 제목" required>
+                        <input type="text" name="project" placeholder="프로젝트명">
+                        <input type="text" name="method" placeholder="실험 방법/도구">
+                        <input type="date" name="date" required>
+                        <textarea name="content" placeholder="실험 과정 및 결과를 입력하세요..." rows="10" required></textarea>
+                        <div class="form-buttons">
+                            <button type="submit">추가</button>
+                            <button type="button" onclick="hideAddForm()">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="posts-list" id="posts-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">🧪</div>
+                        <h3>아직 실험 결과가 없습니다</h3>
+                        <p>첫 번째 실험 결과를 추가해보세요!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 나의 학습 포트폴리오. 모든 권리 보유.</p>
+        </div>
+    </footer>
+
+    <script src="../scripts/blog.js"></script>
+</body>
+</html>

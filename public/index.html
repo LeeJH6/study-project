@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 학습 포트폴리오</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>나의 학습 포트폴리오</h1>
+            <p>지속적인 학습과 성장의 기록</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="study-areas">
+                <h2>학습 영역</h2>
+                <div class="areas-grid">
+                    <div class="area-card" onclick="location.href='pages/paper-review.html'">
+                        <div class="card-icon">📄</div>
+                        <h3>논문 리뷰</h3>
+                        <p>최신 연구 논문 분석 및 정리</p>
+                    </div>
+                    
+                    <div class="area-card" onclick="location.href='pages/experiments.html'">
+                        <div class="card-icon">🧪</div>
+                        <h3>실험 결과</h3>
+                        <p>프로젝트 실험 및 결과 분석</p>
+                    </div>
+                    
+                    <div class="area-card" onclick="location.href='pages/algorithms.html'">
+                        <div class="card-icon">⚡</div>
+                        <h3>알고리즘 스터딩</h3>
+                        <p>자료구조 및 알고리즘 학습</p>
+                    </div>
+                    
+                    <div class="area-card" onclick="location.href='pages/course-notes.html'">
+                        <div class="card-icon">📚</div>
+                        <h3>수업 노트</h3>
+                        <p>학기별 강의 정리 노트</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="recent-posts">
+                <h2>최근 포스트</h2>
+                <div class="posts-preview" id="recent-posts-container">
+                    <!-- 동적으로 로드됩니다 -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 나의 학습 포트폴리오. 모든 권리 보유.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 페이지 로드 시 최근 포스트 가져오기
+        async function loadRecentPosts() {
+            try {
+                const response = await fetch('/api/recent-posts');
+                const posts = await response.json();
+                
+                const container = document.getElementById('recent-posts-container');
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<p class="no-posts">아직 작성된 포스트가 없습니다. 첫 번째 포스트를 작성해보세요!</p>';
+                    return;
+                }
+                
+                container.innerHTML = posts.map(post => `
+                    <div class="post-card">
+                        <span class="post-category">${post.category}</span>
+                        <h4>${post.title}</h4>
+                        <p class="post-date">${post.date}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading recent posts:', error);
+                document.getElementById('recent-posts-container').innerHTML = 
+                    '<p class="error">포스트를 불러오는데 실패했습니다.</p>';
+            }
+        }
+        
+        // 페이지 로드 완료 시 실행
+        document.addEventListener('DOMContentLoaded', loadRecentPosts);
+    </script>
+</body>
+</html>
